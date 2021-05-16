@@ -1,0 +1,50 @@
+base:
+  project: ML_Workflow
+
+data:      # Path
+  data_path: data
+  raw_data: data/raw/
+
+data_load:
+  dataset_csv: data/raw/train.csv
+
+featurize:
+  features_path: data/processed/
+  features_data: data/processed/featured.csv
+  target_column: target
+
+data_split:
+  train_path: data/processed/train.csv
+  test_path: data/processed/test.csv
+  test_size: 0.3
+  random_state: 42
+
+train:
+  cv: 3
+  estimator_name: logreg
+
+  estimators:
+    logreg: 
+      param_grid: 
+        C: [0.001]
+        max_iter: [100]
+        solver: ['lbfgs']
+        multi_class: ['multinomial']
+
+    svm:
+      param_grid:
+        C: [0.1, 1.0]
+        kernel: ["rbf", "linear"]
+        gamma: ["scale"]
+        degree: [3, 5]
+
+model:
+  model_path: models
+  model_name: model.joblib
+
+evaluate:
+  metrics_file: metrics.json
+  confusion_matrix_png: confusion_matrix.png
+  classes_path: classess.csv
+  reports_folder: reports
+

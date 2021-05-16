@@ -1,0 +1,50 @@
+stages:
+  data_load:
+    cmd: python src/pipelines/data_load.py --config=params.yaml
+    deps:
+    - src/pipelines/data_load.py
+    params:
+    - data_load
+    outs:
+    - data/raw/train.csv
+  featurize:
+    cmd: python src/pipelines/featurize.py --config=params.yaml
+    deps:
+    - data/raw/train.csv
+    - src/pipelines/featurize.py
+    params:
+    - featurize
+    outs:
+    - data/processed/featured.csv
+  data_split:
+    cmd: python src/pipelines/data_split.py --config=params.yaml
+    deps:
+    - data/processed/featured.csv
+    - src/pipelines/data_split.py
+    params:
+    - data_split
+    outs:
+    - data/processed/test.csv
+    - data/processed/train.csv
+  train:
+    cmd: python src/pipelines/train.py --config=params.yaml
+    deps:
+    - data/processed/train.csv
+    - src/pipelines/train.py
+    params:
+    - train
+    outs:
+    - models/model.joblib
+  evaluate:
+    cmd: python src/pipelines/evaluate.py --config=params.yaml
+    deps:
+    - data/processed/test.csv
+    - models/model.joblib
+    - src/pipelines/evaluate.py
+    params:
+    - evaluate
+    outs:
+    - reports/confusion_matrix.png
+    - reports/metrics.json
+    plots:
+    - reports/classess.csv

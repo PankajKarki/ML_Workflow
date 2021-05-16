@@ -1,0 +1,109 @@
+data_load:
+  cmd: python src/pipelines/data_load.py --config=params.yaml
+  deps:
+  - path: src/pipelines/data_load.py
+    md5: 28f91205592ac7e5bf005dbfc29ac362
+  params:
+    params.yaml:
+      data_load:
+        dataset_csv: data/raw/train.csv
+  outs:
+  - path: data/raw/train.csv
+    md5: 36607fa248a2e64a49bf9e30497d98ac
+featurize:
+  cmd: python src/pipelines/featurize.py --config=params.yaml
+  deps:
+  - path: data/raw/train.csv
+    md5: 36607fa248a2e64a49bf9e30497d98ac
+  - path: src/pipelines/featurize.py
+    md5: 6dc36d9e63fe339cebe898c52569447e
+  params:
+    params.yaml:
+      featurize:
+        features_path: data/processed/
+        features_data: data/processed/featured.csv
+        target_column: target
+  outs:
+  - path: data/processed/featured.csv
+    md5: 7eb2c702cb8d4c58d2150ae9545c6847
+data_split:
+  cmd: python src/pipelines/data_split.py --config=params.yaml
+  deps:
+  - path: data/processed/featured.csv
+    md5: 7eb2c702cb8d4c58d2150ae9545c6847
+  - path: src/pipelines/data_split.py
+    md5: 7603fd3b1016877872d0eaf51afa7eb9
+  params:
+    params.yaml:
+      data_split:
+        train_path: data/processed/train.csv
+        test_path: data/processed/test.csv
+        test_size: 0.3
+        random_state: 42
+  outs:
+  - path: data/processed/test.csv
+    md5: 566f0faa75b6dee2b1c6bcec86eab6fa
+  - path: data/processed/train.csv
+    md5: a4a56aa1e96d5cce0c56ea8da5693435
+train:
+  cmd: python src/pipelines/train.py --config=params.yaml
+  deps:
+  - path: data/processed/train.csv
+    md5: a4a56aa1e96d5cce0c56ea8da5693435
+  - path: src/pipelines/train.py
+    md5: 32078487b3453ebd36d1100fc8dfa5ae
+  params:
+    params.yaml:
+      train:
+        cv: 3
+        estimator_name: logreg
+        estimators:
+          logreg:
+            param_grid:
+              C:
+              - 0.001
+              max_iter:
+              - 100
+              solver:
+              - lbfgs
+              multi_class:
+              - multinomial
+          svm:
+            param_grid:
+              C:
+              - 0.1
+              - 1.0
+              kernel:
+              - rbf
+              - linear
+              gamma:
+              - scale
+              degree:
+              - 3
+              - 5
+  outs:
+  - path: models/model.joblib
+    md5: 5d4a756eac542af6541806ae631ceee1
+evaluate:
+  cmd: python src/pipelines/evaluate.py --config=params.yaml
+  deps:
+  - path: data/processed/test.csv
+    md5: 566f0faa75b6dee2b1c6bcec86eab6fa
+  - path: models/model.joblib
+    md5: 5d4a756eac542af6541806ae631ceee1
+  - path: src/pipelines/evaluate.py
+    md5: 7e62d9e64acc73077ea583a4efd1ab84
+  params:
+    params.yaml:
+      evaluate:
+        metrics_file: metrics.json
+        confusion_matrix_png: confusion_matrix.png
+        classes_path: classess.csv
+        reports_folder: reports
+  outs:
+  - path: reports/classess.csv
+    md5: 0c13fca59b8c1d3142d9a4dea01c2608
+  - path: reports/confusion_matrix.png
+    md5: 351aee754515f733dadceaa78492a9d8
+  - path: reports/metrics.json
+    md5: 1e908c0d19c3d004e3dccbb2a630daad
