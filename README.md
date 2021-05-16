@@ -44,7 +44,7 @@ Create virtual environment named `dvc-venv` (you may use other name)
 ```bash
 python3 -m venv env
 echo "export PYTHONPATH=$PWD" >> env/bin/activate
-source dvc-venv/bin/activate
+source env/bin/activate
 pip install --upgrade pip
 ```
 Install python libraries

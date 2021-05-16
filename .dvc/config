@@ -2,3 +2,5 @@
     remote = atorage
 ['remote "atorage"']
     url = gdrive://1Qh8_3aXAg-v0HyiGini-oR6WDv3g7j4k
+['remote "origin"']
+    url = https://dagshub.com/PankajKarki/ML_Workflow.dvc
